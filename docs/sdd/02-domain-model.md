@@ -1,6 +1,6 @@
 # 02 — Modelo de dominio
 
-**Estado:** DRAFT v0.1  
+**Estado:** DRAFT v0.2  
 **Última actualización:** 2026-10-01
 
 ## 1. Propósito
@@ -21,12 +21,54 @@ Una persona no tiene un único rol comercial permanente.
 
 Representa un contexto comercial concreto entre ROCA/agente y una persona.
 
-Una oportunidad puede representar, por ejemplo:
+Una oportunidad representa un objetivo o intención comercial concreta entre ROCA/agente y una persona. Puede representar, por ejemplo:
 
-- interés de compra;
-- interés de alquiler;
-- captación de un propietario;
-- otra relación comercial que posteriormente se defina.
+- mudarse a un departamento en alquiler;
+- comprar un inmueble como inversión;
+- captar un inmueble de un propietario;
+- vender una propiedad.
+
+Una persona puede tener múltiples oportunidades simultáneas cuando mantiene objetivos comerciales independientes.
+
+**Regla preliminar:** un cambio de requerimiento no crea por sí mismo una nueva Opportunity. Una nueva Opportunity corresponde a un cambio de objetivo o intención comercial que constituye un proceso independiente.
+
+Ejemplo: “Quiero alquilar un departamento para vivir” → “Quiero comprar una propiedad para alquilarla” puede constituir una nueva Opportunity.
+
+En cambio: “Quiero comprar un departamento para invertir” → “Ahora prefiero comprar una oficina para invertir” puede continuar dentro de la misma Opportunity mediante una nueva versión del Requirement.
+
+### Requirement
+
+Representa lo que una persona necesita, busca, prefiere o rechaza dentro de una Opportunity.
+
+Es una entidad dinámica y versionable. Una Opportunity puede tener múltiples versiones de Requirement a lo largo de su vida, conservando el historial de cambios y un Requirement actual.
+
+Puede incluir, según corresponda:
+
+- tipo de operación;
+- uno o varios tipos de propiedad;
+- presupuesto;
+- zonas, distritos o puntos específicos de interés;
+- dormitorios;
+- cantidad de ambientes;
+- metraje;
+- cochera;
+- mascotas;
+- zonificación;
+- características comerciales;
+- preferencias;
+- restricciones;
+- otros criterios dependientes del tipo de operación o propiedad.
+
+No todos los campos aplican a todos los requerimientos. Una búsqueda de local comercial puede depender de metraje, ubicación y zonificación, mientras una búsqueda residencial puede depender de dormitorios y mascotas.
+
+Los criterios deberán distinguir, cuando sea relevante, entre:
+
+- obligatorio;
+- preferido;
+- flexible;
+- excluido.
+
+Los cambios no deben destruir las versiones anteriores.
 
 ### Property
 
@@ -97,16 +139,21 @@ Las relaciones exactas y sus restricciones de integridad deberán formalizarse p
 
 1. Una persona puede tener múltiples oportunidades simultáneas.
 2. Una persona puede tener diferentes roles en diferentes oportunidades.
-3. Una oportunidad puede existir sin inmueble asociado.
-4. Una oportunidad puede estar asociada a múltiples inmuebles.
-5. Un inmueble puede estar relacionado con múltiples oportunidades.
-6. Una conversación puede existir antes de una oportunidad formal.
-7. El origen histórico de una conversación no debe sobrescribir el origen histórico de la persona u oportunidad.
-8. Una visita pertenece a una oportunidad.
-9. El resultado de una visita es independiente del estado final de la oportunidad.
-10. Una propiedad se considera captada cuando existe autorización para publicarla, según la regla de negocio actual.
-11. Una publicación preparada no implica que haya sido publicada.
-12. El cierre de una oportunidad debe conservar un resultado de cierre.
+3. Una oportunidad representa un objetivo/intención comercial, no un inmueble específico.
+4. Una oportunidad puede tener múltiples versiones de Requirement.
+5. Un cambio de Requirement no implica automáticamente una nueva Opportunity.
+6. Un cambio de objetivo/intención comercial puede requerir una nueva Opportunity.
+7. Una oportunidad puede existir sin inmueble asociado.
+8. Una oportunidad puede estar asociada a múltiples inmuebles.
+9. Un inmueble puede estar relacionado con múltiples oportunidades.
+10. Una conversación puede existir antes de una oportunidad formal.
+11. El origen histórico de una conversación no debe sobrescribir el origen histórico de la persona u oportunidad.
+12. Una visita pertenece a una oportunidad.
+13. El resultado de una visita es independiente del estado final de la oportunidad.
+14. Una propiedad se considera captada cuando existe autorización para publicarla, según la regla de negocio actual.
+15. Una publicación preparada no implica que haya sido publicada.
+16. El cierre de una oportunidad debe conservar un resultado de cierre.
+17. Los cambios relevantes de Requirement e intención deben poder reconstruirse mediante historial/eventos.
 
 ## 5. Flujos conceptuales actuales
 
@@ -126,7 +173,19 @@ Interesado → Seguimiento → Visita → Post-visita → Cerrado o Descartado
 
 ROCA puede responder preguntas, calificar interés, hacer seguimiento rutinario y escalar situaciones que requieran intervención del agente.
 
-## 6. Demanda sin inmueble
+## 6. Demanda y evolución del Requirement
+
+La necesidad de una persona no debe perderse aunque cambie durante el proceso.
+
+ROCA debe poder reconstruir qué buscaba originalmente, qué cambios declaró, cuándo cambió, qué motivo declaró cuando esté disponible, qué inmuebles había considerado y qué Requirement está vigente actualmente.
+
+Un cambio puede ser pequeño, como aumentar el presupuesto, o grande sin cambiar la intención, como pasar de comprar un departamento para inversión a comprar una oficina para inversión.
+
+Un cambio puede ser suficientemente profundo como para representar una nueva Opportunity cuando cambia el objetivo comercial, por ejemplo pasar de alquilar un departamento para vivir a comprar un inmueble para inversión.
+
+**Regla exacta para determinar cuándo una modificación constituye una nueva Opportunity: pendiente de formalización.**
+
+## 7. Opportunity ↔ Property
 
 Si una persona expresa una necesidad y todavía no existe un inmueble adecuado, la necesidad no debe perderse.
 
@@ -159,7 +218,7 @@ No basta necesariamente con saber que una oportunidad está relacionada con un i
 
 **Modelo exacto: TBD.**
 
-Se evaluará una entidad explícita equivalente a PropertyInterest u OpportunityProperty.
+Se evaluará una entidad explícita equivalente a OpportunityProperty.
 
 ## 8. Propiedad preliminar
 
@@ -175,7 +234,19 @@ Por ejemplo, puede conocerse mediante:
 
 **Reglas y estado formal de una propiedad preliminar: TBD.**
 
-## 9. Decisiones pendientes
+## 9. Recomendaciones futuras y memoria comercial
+
+Los Requirements activos pueden utilizarse para encontrar inmuebles compatibles.
+
+El historial de Requirements y las interacciones con inmuebles pueden servir posteriormente como información para recomendaciones.
+
+Debe distinguirse entre información declarada explícitamente por la persona, comportamiento observado, información derivada de eventos, inferencias realizadas por ROCA y preferencias confirmadas.
+
+ROCA no debe convertir automáticamente una inferencia en un hecho de la persona.
+
+El uso de históricos para recomendaciones entre personas diferentes requerirá suficiente evidencia y reglas específicas que se definirán posteriormente.
+
+## 10. Decisiones pendientes
 
 Antes de implementar el modelo de datos deben definirse formalmente:
 
