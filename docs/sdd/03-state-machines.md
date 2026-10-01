@@ -1,6 +1,6 @@
 # 03 — Máquinas de estado
 
-**Estado:** DRAFT v0.1  
+**Estado:** DRAFT v0.2  
 **Última actualización:** 2026-10-01
 
 ## 1. Propósito
@@ -22,25 +22,47 @@ Una modificación de Requirement no debe confundirse con una transición de Oppo
 
 ### 2.1 Concepto
 
-Una Opportunity representa la continuidad de un objetivo o intención comercial.
+Una Opportunity representa la continuidad de un objetivo o intención comercial principal.
+
+**Regla:** una Opportunity tiene un solo objetivo principal.
+
+Si una persona desarrolla otro objetivo comercial independiente, se crea otra Opportunity. No se agregan objetivos paralelos dentro de la misma Opportunity.
 
 Su estado describe en qué punto del proceso comercial se encuentra, no qué propiedades específicas está buscando.
 
 El Requirement describe las condiciones actuales para alcanzar ese objetivo.
 
-### 2.2 Estados conceptuales
+### 2.2 Tipo de proceso comercial
 
-Para compradores/arrendatarios:
+El campo conceptual "type" debe describir qué clase de relación/proceso comercial existe, no confundirse con la operación inmobiliaria.
+
+No se debe usar "property_acquisition" para representar que un comprador quiere adquirir un inmueble, porque el término puede confundirse con la captación/adquisición del inmueble por parte del agente.
+
+Como punto de partida conceptual:
+
+- **Demand / Demanda de inmueble:** una persona busca comprar, alquilar u obtener un inmueble para un objetivo determinado.
+- **Property sale service / Servicio de venta:** un propietario quiere que ROCA/agente comercialice y venda su inmueble.
+- **Property rental service / Servicio de alquiler:** un propietario quiere que ROCA/agente comercialice y alquile su inmueble.
+- **Property capture / Captación:** proceso para conseguir la autorización del propietario para comercializar un inmueble, cuando no sea simplemente parte del servicio de venta/alquiler.
+- **Other / Otro:** procesos comerciales no cubiertos por los anteriores.
+
+La taxonomía definitiva de "type" queda pendiente.
+
+La **operación inmobiliaria** (compra, alquiler, venta, etc.) pertenece conceptualmente al Requirement cuando aplica, y no debe confundirse con el "type" de Opportunity.
+
+### 2.3 Estados conceptuales
+
+Para demanda de comprador/arrendatario:
 
 **Interesado → Seguimiento → Visita → Post-visita → Cerrado / Descartado**
 
-Para propietarios/captación:
+Para propietario/servicio de captación:
 
 **Contactado → Propuesta/Tasación → Seguimiento → Visita → Captación/Cerrado / Descartado**
 
 Estos flujos son una primera representación. La máquina formal deberá permitir variantes según tipo de Opportunity sin duplicar el concepto de Opportunity.
 
-### 2.3 Significado de los estados
+### 2.4 Significado de los estados
 
 #### Interesado / Contactado
 
@@ -88,7 +110,7 @@ La Opportunity deja de estar activa sin alcanzar el resultado comercial satisfac
 
 El descarte debe conservar un motivo estructurado cuando sea posible.
 
-### 2.4 Resultado y motivo de cierre
+### 2.5 Resultado y motivo de cierre
 
 El estado terminal por sí solo no es suficiente.
 
@@ -115,7 +137,7 @@ Los motivos deben permitir distinguir situaciones diferentes, por ejemplo:
 
 **La taxonomía definitiva está pendiente.**
 
-### 2.5 Cambio de objetivo
+### 2.6 Cambio de objetivo
 
 Un cambio de objetivo no debe registrarse simplemente como una modificación del Requirement.
 
@@ -129,21 +151,18 @@ Ejemplo:
 
 El historial de A no se elimina ni se transforma en B.
 
-### 2.6 Objetivos simultáneos
+### 2.7 Objetivos simultáneos
 
 Si la persona mantiene el objetivo original y añade otro objetivo independiente:
 
 1. Opportunity A continúa abierta.
 2. Se crea Opportunity B.
-3. Cada Opportunity conserva su propio Requirement, estado, eventos, visitas y resultado.
+3. Cada Opportunity conserva su propio objetivo principal, Requirement, estado, eventos, visitas y resultado.
 
 Ejemplo:
 
 - A: mudarse a un departamento.
 - B: trasladar su negocio a un nuevo local.
-
-También puede existir:
-
 - C: comprar un almacén.
 
 No debe existir una única Opportunity con Requirements paralelos si estos representan procesos comerciales independientes.
@@ -172,7 +191,7 @@ Esta tabla es conceptual y deberá convertirse en reglas verificables.
 
 ## 4. Transiciones preliminares
 
-### Comprador / arrendatario
+### Demanda de comprador / arrendatario
 
 - created → interesado
 - interesado → seguimiento
@@ -185,7 +204,7 @@ Esta tabla es conceptual y deberá convertirse en reglas verificables.
 - visita → descartado
 - post_visita → descartado
 
-### Propietario
+### Propietario / servicio de comercialización o captación
 
 - created → contactado
 - contactado → propuesta_tasacion
@@ -241,22 +260,25 @@ La máquina de Visit se definirá en detalle posteriormente.
 
 ## 7. Reglas de integridad
 
-1. Una Opportunity terminal no debe volver a un estado activo sin una regla explícita de reapertura.
-2. Crear una nueva versión de Requirement no debe crear automáticamente una nueva Opportunity.
-3. Crear una nueva Opportunity no debe borrar Requirements ni eventos de Opportunities anteriores.
-4. Una Opportunity nueva debe representar un objetivo independiente o un cambio de objetivo.
-5. Una persona puede tener múltiples Opportunities activas simultáneamente.
-6. El cierre de una Opportunity debe conservar el motivo cuando sea conocido.
-7. Los eventos deben permitir reconstruir por qué una Opportunity cambió de estado.
-8. Una visita no equivale automáticamente a un cierre.
-9. Un inmueble recomendado o visitado no determina por sí solo el estado de la Opportunity.
-10. ROCA no debe inferir un cambio de objetivo únicamente por cambios en criterios si la persona no lo ha declarado o si no existe una regla explícita que lo permita.
+1. Una Opportunity tiene un único objetivo principal.
+2. Una Opportunity terminal no debe volver a un estado activo sin una regla explícita de reapertura.
+3. Crear una nueva versión de Requirement no debe crear automáticamente una nueva Opportunity.
+4. Crear una nueva Opportunity no debe borrar Requirements ni eventos de Opportunities anteriores.
+5. Una Opportunity nueva debe representar un objetivo independiente o un cambio de objetivo.
+6. Una persona puede tener múltiples Opportunities activas simultáneamente.
+7. El cierre de una Opportunity debe conservar el motivo cuando sea conocido.
+8. Los eventos deben permitir reconstruir por qué una Opportunity cambió de estado.
+9. Una visita no equivale automáticamente a un cierre.
+10. Un inmueble recomendado o visitado no determina por sí solo el estado de la Opportunity.
+11. ROCA no debe inferir un cambio de objetivo únicamente por cambios en criterios si la persona no lo ha declarado o si no existe una regla explícita que lo permita.
+12. La operación inmobiliaria no debe confundirse con el tipo de Opportunity.
 
 ## 8. Pendientes
 
 Antes de implementar la máquina de estados deben definirse:
 
-- taxonomía formal de tipos/objetivos de Opportunity;
+- taxonomía formal de tipos de Opportunity;
+- taxonomía formal de objetivos;
 - estados definitivos por tipo de Opportunity;
 - estados terminales y reapertura;
 - taxonomía de resultados;
